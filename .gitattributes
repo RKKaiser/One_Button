@@ -1,2 +1,11 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+
+.gitattributes text eol=lf
+
+# 所有文本文件自动处理，统一输出为 LF
+* text=auto eol=lf
+
+*.asset -text
+*.meta -text
+*.unity -text
+*.prefab -text
+*.scene -text

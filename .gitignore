@@ -19,7 +19,7 @@
 [Rr]ecordings/
 
 # IDE 相关
-vs/
+.vs/
 gradle/
 *.csproj
 *.sln
