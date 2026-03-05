@@ -34,6 +34,8 @@ public class SealController : MonoBehaviour
     private AudioSource audioSource;
     private Vector3 originalScale;
 
+    private bool hasDied = false;
+
     private enum SealState { Idle, Floating, Charging, Dashing }
     private SealState currentState = SealState.Idle;
 
@@ -313,5 +315,39 @@ public class SealController : MonoBehaviour
         rb.drag = 0f;
         transform.localScale = originalScale;
         if (chargeBarGameObject != null) chargeBarGameObject.SetActive(false);
+    }
+
+    public void OnHitObstacle()
+    {
+        if (hasDied) return;
+        hasDied = true;
+
+        // 1. 播放失败音效 (可选，也可以在 GameManager 播)
+        // audioSource.PlayOneShot(failSound); 
+
+        // 2. 触发死亡动画 (弹飞)
+        TriggerDeathAnimation();
+
+        // 3. 通知 GameManager 游戏结束
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.TriggerGameOver();
+        }
+    }
+
+    void TriggerDeathAnimation()
+    {
+        // 停止所有控制逻辑
+        enabled = false; // 禁用脚本更新
+
+        // 恢复重力并给一个随机弹飞力
+        rb.gravityScale = 1.5f;
+        rb.drag = 0f;
+        float dir = UnityEngine.Random.Range(-1f, 1f);
+        rb.velocity = new Vector2(dir * 10f, 15f);
+
+        // 禁用碰撞箱防止二次触发
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null) col.enabled = false;
     }
 }
