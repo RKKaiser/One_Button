@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
 
     [Header("配置")]
     public float winWaitTime = 2.0f;  // 胜利后停留时间
-    public float failWaitTime = 2.5f; // 失败后停留时间
+    //public float failWaitTime = 2.5f; // 失败后停留时间
 
     private bool isGameActive = true;
 
@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
         if (sources.Length > 0) sources[0].Play();
 
         // 延迟重开当前关卡
-        StartCoroutine(ReloadLevelAfterDelay(failWaitTime));
+        //StartCoroutine(ReloadLevelAfterDelay(failWaitTime));
     }
 
     // 调用此方法表示游戏胜利
@@ -77,12 +77,12 @@ public class GameManager : MonoBehaviour
         StartCoroutine(LoadNextLevelAfterDelay(winWaitTime));
     }
 
-    IEnumerator ReloadLevelAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        int currentScene = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentScene);
-    }
+    //IEnumerator ReloadLevelAfterDelay(float delay)
+    //{
+    //    yield return new WaitForSeconds(delay);
+    //    int currentScene = SceneManager.GetActiveScene().buildIndex;
+    //    SceneManager.LoadScene(currentScene);
+    //}
 
     IEnumerator LoadNextLevelAfterDelay(float delay)
     {
