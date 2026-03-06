@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System; // 引入 System 命名空间以支持事件
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(AudioSource))]
@@ -26,8 +27,10 @@ public class SealController : MonoBehaviour
     [Header("音效")]
     public AudioClip floatSound;      // 单击上浮
     public AudioClip dashSound;       // 冲刺释放
-    public AudioClip chargeStartSound;// [新增] 蓄力开始的音效 (可选，如"咻"的一声)
-    public AudioClip chargeLoopSound; // [重要] 蓄力期间的循环音效 (如引擎嗡嗡声)
+    public AudioClip chargeStartSound;// 蓄力开始的音效
+    public AudioClip chargeLoopSound; // 蓄力期间的循环音效
+    // [新增] 可以在这里预留死亡音效，或者交给 AudioManager 统一处理
+    // public AudioClip deathSound; 
 
     // --- 私有变量 ---
     private Rigidbody2D rb;
@@ -45,8 +48,12 @@ public class SealController : MonoBehaviour
     private float floatTimer = 0f;
     private float floatMaxTime = 0.4f;
 
-    // [新增] 音效状态标记，防止重复播放或漏播
+    // 音效状态标记
     private bool isChargeSoundPlaying = false;
+
+    // --- [新增] 死亡事件接口 ---
+    // 当角色死亡时触发，传递死亡位置和当前速度方向，供外部死亡动画模块使用
+    public event Action<Vector3, Vector2> OnCharacterDiedEvent;
 
     void Start()
     {
@@ -75,6 +82,8 @@ public class SealController : MonoBehaviour
 
     void Update()
     {
+        if (hasDied) return; // 死亡后停止所有输入响应
+
         // 1. 检测按下
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -89,19 +98,13 @@ public class SealController : MonoBehaviour
 
                 if (chargeBarGameObject != null) chargeBarGameObject.SetActive(true);
 
-                // [修复点 1] 在进入蓄力状态的瞬间，播放“开始音效”
                 PlaySound(chargeStartSound);
 
-                // [修复点 2] 如果有循环音效，标记为需要播放
                 if (chargeLoopSound != null)
                 {
-                    // 注意：这里不直接播放，交给 FixedUpdate 处理，或者在这里直接播放并循环
-                    // 方案 A: 在 Update 里直接播放循环音 (简单，但可能受帧率影响微小延迟)
-                    // 方案 B: 在 FixedUpdate 里检测状态变化播放 (更稳)
-                    // 我们采用方案 C: 在这里播放，并设置标记防止重复
                     if (!isChargeSoundPlaying)
                     {
-                        audioSource.loop = true; // 设置为循环
+                        audioSource.loop = true;
                         audioSource.clip = chargeLoopSound;
                         audioSource.Play();
                         isChargeSoundPlaying = true;
@@ -119,7 +122,6 @@ public class SealController : MonoBehaviour
 
                 if (currentState == SealState.Charging)
                 {
-                    // [修复点 3] 松开时，无论单击还是蓄力，都要停止蓄力音效
                     StopChargeSound();
 
                     if (currentHoldDuration < clickThreshold)
@@ -134,7 +136,7 @@ public class SealController : MonoBehaviour
             }
         }
 
-        // 防御性编程：如果意外松开键但状态还在 Charging (比如切屏了)
+        // 防御性编程
         if (!isSpaceHeld && currentState == SealState.Charging)
         {
             StopChargeSound();
@@ -144,6 +146,8 @@ public class SealController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (hasDied) return; // 死亡后停止物理更新
+
         // 1. 蓄力计时
         if (currentState == SealState.Charging && isSpaceHeld)
         {
@@ -151,7 +155,6 @@ public class SealController : MonoBehaviour
             if (currentHoldDuration > chargeDuration)
             {
                 currentHoldDuration = chargeDuration;
-                // 可以在这里添加蓄力满的特殊音效提示
             }
         }
 
@@ -181,7 +184,6 @@ public class SealController : MonoBehaviour
         floatTimer = 0f;
         rb.velocity = new Vector2(0, floatSpeed);
         PlaySound(floatSound);
-        // 蓄力音已在 Update 的 KeyUp 中停止
     }
 
     void StopFloating()
@@ -202,17 +204,16 @@ public class SealController : MonoBehaviour
 
         rb.velocity = new Vector2(0, currentDashSpeed);
         PlaySound(dashSound);
-        // 蓄力音已在 Update 的 KeyUp 中停止
     }
 
-    // --- 核心修复：音效管理函数 ---
+    // --- 音效管理函数 ---
 
     void StopChargeSound()
     {
         if (isChargeSoundPlaying)
         {
-            audioSource.Stop(); // 停止当前播放的所有声音
-            audioSource.loop = false; // 恢复非循环状态，以免影响下一次 PlayOneShot
+            audioSource.Stop();
+            audioSource.loop = false;
             isChargeSoundPlaying = false;
         }
     }
@@ -221,8 +222,6 @@ public class SealController : MonoBehaviour
     {
         if (clip != null && audioSource != null)
         {
-            // 如果正在播放循环的蓄力音，PlayOneShot 通常会混合播放，不会打断
-            // 但为了保险，如果是 dashSound，我们肯定希望清晰听到
             audioSource.PlayOneShot(clip);
         }
     }
@@ -232,10 +231,6 @@ public class SealController : MonoBehaviour
         switch (currentState)
         {
             case SealState.Idle:
-                rb.velocity = new Vector2(0, 0);
-                rb.gravityScale = 0;
-                rb.drag = 0f;
-                break;
             case SealState.Charging:
                 rb.velocity = new Vector2(0, 0);
                 rb.gravityScale = 0;
@@ -306,7 +301,7 @@ public class SealController : MonoBehaviour
 
     public void ForceReset()
     {
-        StopChargeSound(); // 重置时也要确保停止音效
+        StopChargeSound();
         currentState = SealState.Idle;
         isSpaceHeld = false;
         currentHoldDuration = 0f;
@@ -315,6 +310,17 @@ public class SealController : MonoBehaviour
         rb.drag = 0f;
         transform.localScale = originalScale;
         if (chargeBarGameObject != null) chargeBarGameObject.SetActive(false);
+
+        // 重置死亡状态 (如果需要重玩同一场景而不重新加载)
+        hasDied = false;
+        enabled = true;
+
+        // 重新启用碰撞箱
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null) col.enabled = true;
+
+        // 恢复重力设置
+        rb.gravityScale = idleGravityScale;
     }
 
     public void OnHitObstacle()
@@ -322,32 +328,38 @@ public class SealController : MonoBehaviour
         if (hasDied) return;
         hasDied = true;
 
-        // 1. 播放失败音效 (可选，也可以在 GameManager 播)
-        // audioSource.PlayOneShot(failSound); 
+        // 通知外部系统
+        // 让外部系统有机会生成替身动画
 
-        // 2. 触发死亡动画 (弹飞)
-        TriggerDeathAnimation();
+        // 获取当前的位置和速度方向，传递给死亡动画模块
+        Vector3 deathPosition = transform.position;
+        Vector2 deathVelocity = rb.velocity;
 
-        // 3. 通知 GameManager 游戏结束
+        // 如果速度很小，默认给一个向上的方向，避免替身动画方向错误
+        if (deathVelocity.magnitude < 0.1f)
+        {
+            deathVelocity = Vector2.up;
+        }
+
+        // 触发死亡事件
+        OnCharacterDiedEvent?.Invoke(deathPosition, deathVelocity);
+
+        // 隐藏本体 (替代之前的 enabled = false 和 物理弹飞)
+        gameObject.SetActive(false);
+
+        // 禁用碰撞箱防止干扰
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null) col.enabled = false;
+
+        // 通知 GameManager 游戏结束
         if (GameManager.Instance != null)
         {
             GameManager.Instance.TriggerGameOver();
         }
+
+        // 停止所有音效
+        StopChargeSound();
+        audioSource.Stop();
     }
 
-    void TriggerDeathAnimation()
-    {
-        // 停止所有控制逻辑
-        enabled = false; // 禁用脚本更新
-
-        // 恢复重力并给一个随机弹飞力
-        rb.gravityScale = 1.5f;
-        rb.drag = 0f;
-        float dir = UnityEngine.Random.Range(-1f, 1f);
-        rb.velocity = new Vector2(dir * 10f, 15f);
-
-        // 禁用碰撞箱防止二次触发
-        Collider2D col = GetComponent<Collider2D>();
-        if (col != null) col.enabled = false;
-    }
 }
