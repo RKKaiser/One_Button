@@ -233,10 +233,6 @@ MonoBehaviour:
   deformLerpSpeed: 10
   chargeBarSlider: {fileID: 0}
   chargeBarGameObject: {fileID: 0}
-  floatSound: {fileID: 8300000, guid: 30865f3fdd04c114796f977dcadb8603, type: 3}
-  dashSound: {fileID: 8300000, guid: 6f9f152228770b741a6fac235ff69c23, type: 3}
-  chargeStartSound: {fileID: 0}
-  chargeLoopSound: {fileID: 8300000, guid: ef4d954578b34604b8c6bb5159fdd42f, type: 3}
 --- !u!50 &136165904
 Rigidbody2D:
   serializedVersion: 4
@@ -451,6 +447,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   eelPrefab: {fileID: 2670420883641622821, guid: fdfe7bc32a960cc4b882452a6648ec53, type: 3}
   sharkPrefab: {fileID: 8271037012892582131, guid: 1ab500c3fb387ff488867f0b830b4b48, type: 3}
+  chaserPrefab: {fileID: 2777056325706324491, guid: 157dc101df39aa342b846b092f97cfb0, type: 3}
   spawnPoints:
   - yPos: 10
     type: 0
@@ -464,6 +461,8 @@ MonoBehaviour:
     type: 1
     forceDirectionRight: 1
     xOffset: 0
+  chaserSpawnConfigs:
+  - initialYDistanceFromPlayer: 7
   baseSpawnXRange: 8
   seaSurfaceY: 20
   showGizmos: 1
@@ -477,7 +476,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 735910934}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Obstacles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -561,7 +560,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 1
+  orthographic: 0
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
@@ -586,9 +585,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 771025209}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -15}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

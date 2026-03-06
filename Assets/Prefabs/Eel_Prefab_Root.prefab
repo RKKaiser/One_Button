@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5149587127616227630}
   - component: {fileID: 7827831840456822117}
   - component: {fileID: 3202652554866791198}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Eel_Prefab_Root
   m_TagString: Obstacle
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ MonoBehaviour:
   moveSpeed: 8
   waitTime: 0.5
   activationDistance: 18
-  screenPadding: 2
+  screenPadding: 4
   isMovingRight: 1
 --- !u!50 &7827831840456822117
 Rigidbody2D:
