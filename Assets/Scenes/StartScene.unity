@@ -593,6 +593,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 729428891}
   m_CullTransparentMesh: 1
+--- !u!1 &1530031289
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1530031291}
+  - component: {fileID: 1530031290}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1530031290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1530031289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 948fb2e02de78c34cb4352afc4e6fae4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floatSound: {fileID: 8300000, guid: 30865f3fdd04c114796f977dcadb8603, type: 3}
+  dashSound: {fileID: 8300000, guid: 6f9f152228770b741a6fac235ff69c23, type: 3}
+  chargeStartSound: {fileID: 0}
+  chargeLoopSound: {fileID: 8300000, guid: ef4d954578b34604b8c6bb5159fdd42f, type: 3}
+--- !u!4 &1530031291
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1530031289}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1545407967
 GameObject:
   m_ObjectHideFlags: 0
@@ -834,3 +882,4 @@ SceneRoots:
   - {fileID: 1789014144}
   - {fileID: 2071931467}
   - {fileID: 281284375}
+  - {fileID: 1530031291}
