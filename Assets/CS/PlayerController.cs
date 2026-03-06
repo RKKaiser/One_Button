@@ -3,7 +3,6 @@ using UnityEngine.UI;
 using System; // 引入 System 命名空间以支持事件
 
 [RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(AudioSource))]
 public class SealController : MonoBehaviour
 {
     [Header("运动参数")]
@@ -24,19 +23,20 @@ public class SealController : MonoBehaviour
     public Slider chargeBarSlider;
     public GameObject chargeBarGameObject;
 
+    // 删除音效引用
+    /*
     [Header("音效")]
-    public AudioClip floatSound;      // 单击上浮
-    public AudioClip dashSound;       // 冲刺释放
+    public AudioClip floatSound; // 单击上浮
+    public AudioClip dashSound; // 冲刺释放
     public AudioClip chargeStartSound;// 蓄力开始的音效
     public AudioClip chargeLoopSound; // 蓄力期间的循环音效
-    // [新增] 可以在这里预留死亡音效，或者交给 AudioManager 统一处理
-    // public AudioClip deathSound; 
+    */
 
     // --- 私有变量 ---
     private Rigidbody2D rb;
-    private AudioSource audioSource;
+    //  删除 AudioSource 变量
+    // private AudioSource audioSource;
     private Vector3 originalScale;
-
     private bool hasDied = false;
 
     private enum SealState { Idle, Floating, Charging, Dashing }
@@ -48,37 +48,50 @@ public class SealController : MonoBehaviour
     private float floatTimer = 0f;
     private float floatMaxTime = 0.4f;
 
-    // 音效状态标记
-    private bool isChargeSoundPlaying = false;
+    //  删除音效状态标记
+    // private bool isChargeSoundPlaying = false;
 
-    // --- [新增] 死亡事件接口 ---
+    // --- 死亡事件接口 ---
     // 当角色死亡时触发，传递死亡位置和当前速度方向，供外部死亡动画模块使用
     public event Action<Vector3, Vector2> OnCharacterDiedEvent;
+
+    // --- 音效事件接口 ---
+    // 定义音效类型枚举
+    public enum SoundType { Float, Dash, ChargeStart, ChargeLoop, ChargeStop };
+
+    // 定义音效触发事件
+    public static event Action<SoundType> OnPlaySoundEvent;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        audioSource = GetComponent<AudioSource>();
+        // 删除获取 AudioSource 组件
+        // audioSource = GetComponent<AudioSource>();
         originalScale = transform.localScale;
-
         rb.gravityScale = idleGravityScale;
         rb.drag = 0f;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
-        if (chargeBarGameObject != null) chargeBarGameObject.SetActive(false);
+        if (chargeBarGameObject != null)
+            chargeBarGameObject.SetActive(false);
 
-        PreloadAudio();
+        // 删除 PreloadAudio() 调用
+        // PreloadAudio();
     }
 
+    // 删除整个 PreloadAudio 函数
+    /*
     void PreloadAudio()
     {
         if (audioSource == null) return;
+
         if (floatSound != null) audioSource.PlayOneShot(floatSound, 0f);
         if (dashSound != null) audioSource.PlayOneShot(dashSound, 0f);
         if (chargeStartSound != null) audioSource.PlayOneShot(chargeStartSound, 0f);
         if (chargeLoopSound != null) audioSource.PlayOneShot(chargeLoopSound, 0f);
         audioSource.Stop();
     }
+    */
 
     void Update()
     {
@@ -88,7 +101,6 @@ public class SealController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             isSpaceHeld = true;
-
             if (currentState == SealState.Idle || currentState == SealState.Floating)
             {
                 currentState = SealState.Charging;
@@ -96,20 +108,14 @@ public class SealController : MonoBehaviour
                 floatTimer = 0f;
                 rb.velocity = new Vector2(rb.velocity.x, 0);
 
-                if (chargeBarGameObject != null) chargeBarGameObject.SetActive(true);
+                if (chargeBarGameObject != null)
+                    chargeBarGameObject.SetActive(true);
 
-                PlaySound(chargeStartSound);
+                //  触发音效事件，而非直接播放
+                OnPlaySoundEvent?.Invoke(SoundType.ChargeStart);
 
-                if (chargeLoopSound != null)
-                {
-                    if (!isChargeSoundPlaying)
-                    {
-                        audioSource.loop = true;
-                        audioSource.clip = chargeLoopSound;
-                        audioSource.Play();
-                        isChargeSoundPlaying = true;
-                    }
-                }
+                //  触发循环音效播放事件
+                OnPlaySoundEvent?.Invoke(SoundType.ChargeLoop);
             }
         }
 
@@ -119,10 +125,10 @@ public class SealController : MonoBehaviour
             if (isSpaceHeld)
             {
                 isSpaceHeld = false;
-
                 if (currentState == SealState.Charging)
                 {
-                    StopChargeSound();
+                    //  触发停止循环音效事件
+                    OnPlaySoundEvent?.Invoke(SoundType.ChargeStop);
 
                     if (currentHoldDuration < clickThreshold)
                     {
@@ -139,7 +145,8 @@ public class SealController : MonoBehaviour
         // 防御性编程
         if (!isSpaceHeld && currentState == SealState.Charging)
         {
-            StopChargeSound();
+            //  触发停止循环音效事件
+            OnPlaySoundEvent?.Invoke(SoundType.ChargeStop);
             currentState = SealState.Idle;
         }
     }
@@ -177,13 +184,13 @@ public class SealController : MonoBehaviour
     }
 
     // --- 动作执行 ---
-
     void PerformFloat()
     {
         currentState = SealState.Floating;
         floatTimer = 0f;
         rb.velocity = new Vector2(0, floatSpeed);
-        PlaySound(floatSound);
+        //  触发音效事件，而非直接播放
+        OnPlaySoundEvent?.Invoke(SoundType.Float);
     }
 
     void StopFloating()
@@ -201,13 +208,13 @@ public class SealController : MonoBehaviour
         currentState = SealState.Dashing;
         float chargeRatio = Mathf.Clamp01(currentHoldDuration / chargeDuration);
         float currentDashSpeed = Mathf.Lerp(minDashSpeed, maxDashSpeed, chargeRatio);
-
         rb.velocity = new Vector2(0, currentDashSpeed);
-        PlaySound(dashSound);
+        //  触发音效事件，而非直接播放
+        OnPlaySoundEvent?.Invoke(SoundType.Dash);
     }
 
-    // --- 音效管理函数 ---
-
+    // --- 删除所有音效管理函数 ---
+    /*
     void StopChargeSound()
     {
         if (isChargeSoundPlaying)
@@ -225,6 +232,7 @@ public class SealController : MonoBehaviour
             audioSource.PlayOneShot(clip);
         }
     }
+    */
 
     void HandleMovementPhysics()
     {
@@ -246,7 +254,8 @@ public class SealController : MonoBehaviour
                 {
                     currentState = SealState.Idle;
                     rb.velocity = Vector2.zero;
-                    if (chargeBarGameObject != null) chargeBarGameObject.SetActive(false);
+                    if (chargeBarGameObject != null)
+                        chargeBarGameObject.SetActive(false);
                 }
                 else
                 {
@@ -286,7 +295,8 @@ public class SealController : MonoBehaviour
     {
         if (currentState == SealState.Charging)
         {
-            if (chargeBarGameObject != null) chargeBarGameObject.SetActive(true);
+            if (chargeBarGameObject != null)
+                chargeBarGameObject.SetActive(true);
             if (chargeBarSlider != null)
             {
                 float ratio = Mathf.Clamp01(currentHoldDuration / chargeDuration);
@@ -295,13 +305,15 @@ public class SealController : MonoBehaviour
         }
         else
         {
-            if (chargeBarGameObject != null) chargeBarGameObject.SetActive(false);
+            if (chargeBarGameObject != null)
+                chargeBarGameObject.SetActive(false);
         }
     }
 
     public void ForceReset()
     {
-        StopChargeSound();
+        //  触发停止循环音效事件
+        OnPlaySoundEvent?.Invoke(SoundType.ChargeStop);
         currentState = SealState.Idle;
         isSpaceHeld = false;
         currentHoldDuration = 0f;
@@ -309,13 +321,14 @@ public class SealController : MonoBehaviour
         rb.velocity = Vector2.zero;
         rb.drag = 0f;
         transform.localScale = originalScale;
-        if (chargeBarGameObject != null) chargeBarGameObject.SetActive(false);
+
+        if (chargeBarGameObject != null)
+            chargeBarGameObject.SetActive(false);
 
         // 重置死亡状态 (如果需要重玩同一场景而不重新加载)
         hasDied = false;
-        enabled = true;
+        enabled = true; // 重新启用碰撞箱
 
-        // 重新启用碰撞箱
         Collider2D col = GetComponent<Collider2D>();
         if (col != null) col.enabled = true;
 
@@ -330,7 +343,6 @@ public class SealController : MonoBehaviour
 
         // 通知外部系统
         // 让外部系统有机会生成替身动画
-
         // 获取当前的位置和速度方向，传递给死亡动画模块
         Vector3 deathPosition = transform.position;
         Vector2 deathVelocity = rb.velocity;
@@ -357,9 +369,9 @@ public class SealController : MonoBehaviour
             GameManager.Instance.TriggerGameOver();
         }
 
-        // 停止所有音效
-        StopChargeSound();
-        audioSource.Stop();
+        //  触发停止循环音效事件
+        OnPlaySoundEvent?.Invoke(SoundType.ChargeStop);
+        //  在这里可以添加播放死亡音效的事件
+        // OnPlaySoundEvent?.Invoke(SoundType.Death);
     }
-
 }
