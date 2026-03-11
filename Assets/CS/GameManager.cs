@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
     {
         isGameActive = true;
         Time.timeScale = 1.0f; // 确保时间正常流动
-
+        
         if (failPanel) failPanel.SetActive(false);
         if (winPanel) winPanel.SetActive(false);
         if (gameHUD) gameHUD.SetActive(true);
@@ -87,6 +87,8 @@ public class GameManager : MonoBehaviour
     IEnumerator LoadNextLevelAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
+        if (failPanel) failPanel.SetActive(false);
+        if (winPanel) winPanel.SetActive(false);
         int currentScene = SceneManager.GetActiveScene().buildIndex;
         int nextScene = currentScene + 1;
 

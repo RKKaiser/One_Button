@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class GameSetting: MonoBehaviour
 {
+    public GameObject failPanel;
     public void QuitGame()
     {
 #if UNITY_EDITOR
@@ -15,6 +16,11 @@ public class GameSetting: MonoBehaviour
     public void RestartGame()
     {
         int currentScene = SceneManager.GetActiveScene().buildIndex;
+        if (failPanel)
+        {
+            failPanel.SetActive(false);
+            Debug.Log("Restart Game");
+        }
         SceneManager.LoadScene(currentScene);
     }
 
