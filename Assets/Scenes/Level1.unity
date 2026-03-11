@@ -463,6 +463,12 @@ MonoBehaviour:
     xOffset: 0
   chaserSpawnConfigs:
   - initialYDistanceFromPlayer: 7
+    parametersToOverride:
+      enabled: 0
+      minChaseSpeed: 0
+      maxChaseSpeed: 0
+      minSpeedDistance: 0
+      maxSpeedDistance: 0
   baseSpawnXRange: 8
   seaSurfaceY: 20
   showGizmos: 1
