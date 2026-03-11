@@ -228,7 +228,9 @@ MonoBehaviour:
   minDashSpeed: 10
   chargeDuration: 0.75
   dashDrag: 8
+  chargeBrakeDrag: 25
   clickThreshold: 0.2
+  dashLockTime: 0.3
   squashAmount: 0.6
   deformLerpSpeed: 10
   chargeBarSlider: {fileID: 0}
@@ -453,166 +455,371 @@ MonoBehaviour:
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 12
     type: 0
     forceDirectionRight: 1
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 17
     type: 0
     forceDirectionRight: 1
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 27
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 35
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 39
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 45
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 45
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 65
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 80
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 90
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 105
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 115
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 125
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 135
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 145
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 150
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 160
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 165
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 175
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 185
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 195
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 195
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 210
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 210
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 219
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 228
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 228
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 235
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 240
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 245
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 255
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 270
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 280
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 280
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 283
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 290
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 302
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 302
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 312
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 312
     type: 1
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   chaserSpawnConfigs:
   - initialYDistanceFromPlayer: 7
     parametersToOverride:
@@ -622,7 +829,7 @@ MonoBehaviour:
       minSpeedDistance: 0
       maxSpeedDistance: 0
   baseSpawnXRange: 8
-  seaSurfaceY: 20
+  seaSurfaceY: 350
   showGizmos: 1
   obstacleParent: {fileID: 0}
 --- !u!1 &735910933
