@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System; // 引入 System 命名空间以支持事件
+using System;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class SealController : MonoBehaviour
@@ -23,50 +23,28 @@ public class SealController : MonoBehaviour
     public Slider chargeBarSlider;
     public GameObject chargeBarGameObject;
 
-    // 删除音效引用
-    /*
-    [Header("音效")]
-    public AudioClip floatSound; // 单击上浮
-    public AudioClip dashSound; // 冲刺释放
-    public AudioClip chargeStartSound;// 蓄力开始的音效
-    public AudioClip chargeLoopSound; // 蓄力期间的循环音效
-    */
-
-    // --- 私有变量 ---
+    // --- 私有变量 --- 
     private Rigidbody2D rb;
-    //  删除 AudioSource 变量
-    // private AudioSource audioSource;
     private Vector3 originalScale;
     private bool hasDied = false;
 
     private enum SealState { Idle, Floating, Charging, Dashing }
     private SealState currentState = SealState.Idle;
 
-    // 输入与计时
+    // 输入与计时 
     private bool isSpaceHeld = false;
     private float currentHoldDuration = 0f;
     private float floatTimer = 0f;
     private float floatMaxTime = 0.4f;
 
-    //  删除音效状态标记
-    // private bool isChargeSoundPlaying = false;
-
-    // --- 死亡事件接口 ---
-    // 当角色死亡时触发，传递死亡位置和当前速度方向，供外部死亡动画模块使用
+    // --- 死亡事件接口 --- 
     public event Action<Vector3, Vector2> OnCharacterDiedEvent;
-
-    // --- 音效事件接口 ---
-    // 定义音效类型枚举
     public enum SoundType { Float, Dash, ChargeStart, ChargeLoop, ChargeStop };
-
-    // 定义音效触发事件
     public static event Action<SoundType> OnPlaySoundEvent;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        // 删除获取 AudioSource 组件
-        // audioSource = GetComponent<AudioSource>();
         originalScale = transform.localScale;
         rb.gravityScale = idleGravityScale;
         rb.drag = 0f;
@@ -74,60 +52,37 @@ public class SealController : MonoBehaviour
 
         if (chargeBarGameObject != null)
             chargeBarGameObject.SetActive(false);
-
-        // 删除 PreloadAudio() 调用
-        // PreloadAudio();
     }
-
-    // 删除整个 PreloadAudio 函数
-    /*
-    void PreloadAudio()
-    {
-        if (audioSource == null) return;
-
-        if (floatSound != null) audioSource.PlayOneShot(floatSound, 0f);
-        if (dashSound != null) audioSource.PlayOneShot(dashSound, 0f);
-        if (chargeStartSound != null) audioSource.PlayOneShot(chargeStartSound, 0f);
-        if (chargeLoopSound != null) audioSource.PlayOneShot(chargeLoopSound, 0f);
-        audioSource.Stop();
-    }
-    */
 
     void Update()
     {
-        if (hasDied) return; // 死亡后停止所有输入响应
+        if (hasDied) return;
 
-        // 1. 检测按下
+        // 1. 检测按下 
         if (Input.GetKeyDown(KeyCode.Space))
         {
             isSpaceHeld = true;
-            if (currentState == SealState.Idle || currentState == SealState.Floating)
+
+            // [修改] 优化逻辑：允许在 Dashing 末期或 Floating 末期直接打断进入蓄力
+            // 只要不是已经在蓄力中，都允许重新开启蓄力流程
+            if (currentState != SealState.Charging)
             {
-                currentState = SealState.Charging;
-                currentHoldDuration = 0f;
-                floatTimer = 0f;
-                rb.velocity = new Vector2(rb.velocity.x, 0);
-
-                if (chargeBarGameObject != null)
-                    chargeBarGameObject.SetActive(true);
-
-                //  触发音效事件，而非直接播放
-                OnPlaySoundEvent?.Invoke(SoundType.ChargeStart);
-
-                //  触发循环音效播放事件
-                OnPlaySoundEvent?.Invoke(SoundType.ChargeLoop);
+                // 如果当前正在 Dash 但速度已经很慢了，或者正在 Float，直接打断
+                // 这样消除了“等待状态自动复位”的冷却时间
+                EnterChargeState();
             }
         }
 
-        // 2. 检测松开
+        // 2. 检测松开 
         if (Input.GetKeyUp(KeyCode.Space))
         {
             if (isSpaceHeld)
             {
                 isSpaceHeld = false;
+
+                // 只有在蓄力状态下松开才执行跳跃逻辑
                 if (currentState == SealState.Charging)
                 {
-                    //  触发停止循环音效事件
                     OnPlaySoundEvent?.Invoke(SoundType.ChargeStop);
 
                     if (currentHoldDuration < clickThreshold)
@@ -139,23 +94,45 @@ public class SealController : MonoBehaviour
                         PerformDash();
                     }
                 }
+                // [新增] 如果是在 Dashing 或 Floating 过程中松开了按键（虽然通常不会在这时候松，因为那是自动的）
+                // 这里不需要额外操作，让物理自然衰减即可，或者根据需要重置
             }
         }
 
-        // 防御性编程
+        // 防御性编程：如果按键状态不一致，强制修正
         if (!isSpaceHeld && currentState == SealState.Charging)
         {
-            //  触发停止循环音效事件
             OnPlaySoundEvent?.Invoke(SoundType.ChargeStop);
+            // [修改] 如果意外中断蓄力（比如切出窗口），不要直接变 Idle，而是根据当前速度判断
+            // 但为了简单起见，这里保持原逻辑归零，或者可以改为保持当前速度
             currentState = SealState.Idle;
+            rb.velocity = Vector2.zero; // 防止蓄力中断后速度残留
         }
+    }
+
+    // [新增] 提取进入蓄力状态的逻辑，方便复用和打断
+    void EnterChargeState()
+    {
+        currentState = SealState.Charging;
+        currentHoldDuration = 0f;
+        floatTimer = 0f;
+
+        // [关键修改] 进入蓄力时，立即水平归零，垂直速度可以根据需求选择是否立即归零
+        // 为了手感更连贯，如果是在 Dash 末尾，保留一点点惯性可能更自然，但为了精准控制，这里选择立即刹停垂直速度
+        rb.velocity = new Vector2(0, 0);
+
+        if (chargeBarGameObject != null)
+            chargeBarGameObject.SetActive(true);
+
+        OnPlaySoundEvent?.Invoke(SoundType.ChargeStart);
+        OnPlaySoundEvent?.Invoke(SoundType.ChargeLoop);
     }
 
     void FixedUpdate()
     {
-        if (hasDied) return; // 死亡后停止物理更新
+        if (hasDied) return;
 
-        // 1. 蓄力计时
+        // 1. 蓄力计时 
         if (currentState == SealState.Charging && isSpaceHeld)
         {
             currentHoldDuration += Time.fixedDeltaTime;
@@ -165,7 +142,7 @@ public class SealController : MonoBehaviour
             }
         }
 
-        // 2. 上浮计时
+        // 2. 上浮计时 
         if (currentState == SealState.Floating)
         {
             floatTimer += Time.fixedDeltaTime;
@@ -175,21 +152,19 @@ public class SealController : MonoBehaviour
             }
         }
 
-        // 3. 物理移动
+        // 3. 物理移动 
         HandleMovementPhysics();
 
-        // 4. 视觉与 UI
+        // 4. 视觉与 UI 
         HandleVisualDeformation();
         UpdateChargeUI();
     }
 
-    // --- 动作执行 ---
     void PerformFloat()
     {
         currentState = SealState.Floating;
         floatTimer = 0f;
         rb.velocity = new Vector2(0, floatSpeed);
-        //  触发音效事件，而非直接播放
         OnPlaySoundEvent?.Invoke(SoundType.Float);
     }
 
@@ -209,30 +184,8 @@ public class SealController : MonoBehaviour
         float chargeRatio = Mathf.Clamp01(currentHoldDuration / chargeDuration);
         float currentDashSpeed = Mathf.Lerp(minDashSpeed, maxDashSpeed, chargeRatio);
         rb.velocity = new Vector2(0, currentDashSpeed);
-        //  触发音效事件，而非直接播放
         OnPlaySoundEvent?.Invoke(SoundType.Dash);
     }
-
-    // --- 删除所有音效管理函数 ---
-    /*
-    void StopChargeSound()
-    {
-        if (isChargeSoundPlaying)
-        {
-            audioSource.Stop();
-            audioSource.loop = false;
-            isChargeSoundPlaying = false;
-        }
-    }
-
-    void PlaySound(AudioClip clip)
-    {
-        if (clip != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(clip);
-        }
-    }
-    */
 
     void HandleMovementPhysics()
     {
@@ -250,16 +203,23 @@ public class SealController : MonoBehaviour
                 break;
             case SealState.Dashing:
                 rb.gravityScale = 0;
-                if (rb.velocity.y < 0.5f)
+
+                // [修改] 移除了自动切换回 Idle 的逻辑！
+                // 之前：if (rb.velocity.y < 0.5f) { currentState = Idle; ... }
+                // 现在：让 Dash 状态一直保持，直到玩家再次按下空格键触发 EnterChargeState()
+                // 这样玩家在 Dash 结束后的滑行期间，随时按下空格都能立刻响应，没有“冷却期”
+
+                rb.drag = dashDrag;
+
+                // 可选：如果速度几乎为0且长时间没操作，可以自动归为Idle以节省逻辑，
+                // 但为了手感，我们允许它在 Dashing 状态下“滑行”直到下一次操作
+                if (rb.velocity.y < 0.1f && !isSpaceHeld)
                 {
-                    currentState = SealState.Idle;
-                    rb.velocity = Vector2.zero;
-                    if (chargeBarGameObject != null)
-                        chargeBarGameObject.SetActive(false);
-                }
-                else
-                {
-                    rb.drag = dashDrag;
+                    // 仅仅在视觉上或逻辑上视为空闲，但状态机保持 Dashing 以便随时打断
+                    // 或者你可以这里强制设为 Idle，但必须在 Update 的 GetKeyDown 里允许从 Dashing 直接跳转
+                    // 鉴于我们在 Update 里已经做了允许从 Dashing 跳转，这里可以安全地自动复位，
+                    // 但为了防止那一瞬间的输入丢失，建议还是不要在这里频繁切换状态。
+                    // 最稳妥的方式：不切换状态，让速度自然为0，下次按键直接覆盖。
                 }
                 break;
         }
@@ -278,10 +238,19 @@ public class SealController : MonoBehaviour
         }
         else if (currentState == SealState.Dashing)
         {
-            float speedRatio = Mathf.Clamp01(rb.velocity.y / maxDashSpeed);
-            float scaleY = Mathf.Lerp(1f, 1.3f, speedRatio);
-            float scaleX = Mathf.Lerp(1f, 0.8f, speedRatio);
-            targetScale = new Vector3(scaleX * originalScale.x, scaleY * originalScale.y, originalScale.z);
+            // [修改] 防止除以零或速度极低时的形变闪烁
+            if (maxDashSpeed > 0)
+            {
+                float speedRatio = Mathf.Clamp01(rb.velocity.y / maxDashSpeed);
+                // 如果速度很低，形变应该恢复，而不是保持拉长
+                float scaleY = Mathf.Lerp(1f, 1.3f, speedRatio);
+                float scaleX = Mathf.Lerp(1f, 0.8f, speedRatio);
+                targetScale = new Vector3(scaleX * originalScale.x, scaleY * originalScale.y, originalScale.z);
+            }
+            else
+            {
+                targetScale = originalScale;
+            }
         }
         else if (currentState == SealState.Floating)
         {
@@ -297,6 +266,7 @@ public class SealController : MonoBehaviour
         {
             if (chargeBarGameObject != null)
                 chargeBarGameObject.SetActive(true);
+
             if (chargeBarSlider != null)
             {
                 float ratio = Mathf.Clamp01(currentHoldDuration / chargeDuration);
@@ -312,8 +282,8 @@ public class SealController : MonoBehaviour
 
     public void ForceReset()
     {
-        //  触发停止循环音效事件
         OnPlaySoundEvent?.Invoke(SoundType.ChargeStop);
+
         currentState = SealState.Idle;
         isSpaceHeld = false;
         currentHoldDuration = 0f;
@@ -325,53 +295,37 @@ public class SealController : MonoBehaviour
         if (chargeBarGameObject != null)
             chargeBarGameObject.SetActive(false);
 
-        // 重置死亡状态 (如果需要重玩同一场景而不重新加载)
         hasDied = false;
-        enabled = true; // 重新启用碰撞箱
-
+        enabled = true;
         Collider2D col = GetComponent<Collider2D>();
         if (col != null) col.enabled = true;
-
-        // 恢复重力设置
         rb.gravityScale = idleGravityScale;
     }
 
     public void OnHitObstacle()
     {
         if (hasDied) return;
-        hasDied = true;
 
-        // 通知外部系统
-        // 让外部系统有机会生成替身动画
-        // 获取当前的位置和速度方向，传递给死亡动画模块
+        hasDied = true;
         Vector3 deathPosition = transform.position;
         Vector2 deathVelocity = rb.velocity;
 
-        // 如果速度很小，默认给一个向上的方向，避免替身动画方向错误
         if (deathVelocity.magnitude < 0.1f)
         {
             deathVelocity = Vector2.up;
         }
 
-        // 触发死亡事件
         OnCharacterDiedEvent?.Invoke(deathPosition, deathVelocity);
-
-        // 隐藏本体 (替代之前的 enabled = false 和 物理弹飞)
         gameObject.SetActive(false);
 
-        // 禁用碰撞箱防止干扰
         Collider2D col = GetComponent<Collider2D>();
         if (col != null) col.enabled = false;
 
-        // 通知 GameManager 游戏结束
         if (GameManager.Instance != null)
         {
             GameManager.Instance.TriggerGameOver();
         }
 
-        //  触发停止循环音效事件
         OnPlaySoundEvent?.Invoke(SoundType.ChargeStop);
-        //  在这里可以添加播放死亡音效的事件
-        // OnPlaySoundEvent?.Invoke(SoundType.Death);
     }
 }

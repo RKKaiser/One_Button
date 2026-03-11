@@ -453,62 +453,137 @@ MonoBehaviour:
     type: 0
     forceDirectionRight: 1
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 25
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 35
     type: 0
     forceDirectionRight: 1
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 44
     type: 0
     forceDirectionRight: 1
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 52
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 57
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 62
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 66
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 70
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 75
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 75
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 83
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 83
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 90
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   - yPos: 90
     type: 0
     forceDirectionRight: 0
     xOffset: 0
+    parametersToOverride:
+      enabled: 0
+      speed: 0
+      activationDistance: 0
+      waitTime: 0
   chaserSpawnConfigs:
   - initialYDistanceFromPlayer: 7
     parametersToOverride:
@@ -518,7 +593,7 @@ MonoBehaviour:
       minSpeedDistance: 0
       maxSpeedDistance: 0
   baseSpawnXRange: 8
-  seaSurfaceY: 20
+  seaSurfaceY: 100
   showGizmos: 1
   obstacleParent: {fileID: 0}
 --- !u!1 &735910933
