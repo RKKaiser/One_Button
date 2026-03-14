@@ -100,9 +100,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 12
-  waitTime: 0.7
+  waitTime: 1
   activationDistance: 18
-  screenPadding: 4
+  screenPadding: 6
   isMovingRight: 1
 --- !u!50 &1307395292852395905
 Rigidbody2D:
