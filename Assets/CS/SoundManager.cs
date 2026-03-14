@@ -17,6 +17,7 @@ public class SoundController : MonoBehaviour
 
     void Awake()
     {
+        DontDestroyOnLoad(gameObject);
         // 确保实例唯一
         if (FindObjectsOfType<SoundController>().Length > 1)
         {
