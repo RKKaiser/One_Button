@@ -106,22 +106,23 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
+        // 先隐藏当前面板
         if (failPanel) failPanel.SetActive(false);
         if (winPanel) winPanel.SetActive(false);
+
+        // 重置游戏状态，为下一关做准备
+        ResetGameUI();
 
         int currentScene = SceneManager.GetActiveScene().buildIndex;
         int nextScene = currentScene + 1;
 
-        // 检查是否有下一关 
         if (nextScene >= SceneManager.sceneCountInBuildSettings)
         {
-            Debug.Log("恭喜通关所有关卡！返回第一关或显示总通关界面。");
-            nextScene = 0; // 循环回第一关，或者你可以加载一个 "EndGame" 场景
+            nextScene = 0;
+            ResetGameUI();
         }
 
-        // 注意：加载下一关前，如果是循环回第一关，建议在加载前调用 RestartGame()
-        // 但 LoadScene 会触发新场景的 Start，如果新场景是全新的，Start 会处理重置。
-        // 如果是同一个场景重载，则必须由外部调用 RestartGame。
+        Debug.Log($"Loading Scene {nextScene}");
         SceneManager.LoadScene(nextScene);
     }
 
