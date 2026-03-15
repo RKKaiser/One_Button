@@ -42,6 +42,14 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void RestartGame()
     {
+        if (SoundController.Instance != null)
+        {
+            SoundController.Instance.StopAllSounds();
+        }
+
+        // 恢复时间流速
+        Time.timeScale = 1.0f;
+
         ResetGameUI();
     }
 
@@ -76,9 +84,10 @@ public class GameManager : MonoBehaviour
         if (failPanel) failPanel.SetActive(true);
         if (gameHUD) gameHUD.SetActive(false);
 
-        // 播放失败音效
-        AudioSource[] sources = GetComponents<AudioSource>();
-        if (sources.Length > 0) sources[0].Play();
+        if (SoundController.Instance != null)
+        {
+            SoundController.Instance.PlayGameSound(false); // false 表示失败
+        }
     }
 
     // 调用此方法表示游戏胜利 
@@ -93,6 +102,11 @@ public class GameManager : MonoBehaviour
 
         if (winPanel) winPanel.SetActive(true);
         if (gameHUD) gameHUD.SetActive(false);
+
+        if (SoundController.Instance != null)
+        {
+            SoundController.Instance.PlayGameSound(true); // true 表示胜利
+        }
 
         // 延迟进入下一关 
         StartCoroutine(LoadNextLevelAfterDelay(winWaitTime));
