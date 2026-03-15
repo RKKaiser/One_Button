@@ -31,9 +31,11 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // 仅在第一次启动或手动调用 RestartGame 后初始化 UI
-        // 注意：由于 DontDestroyOnLoad，Start 不会在每次场景加载时运行，
-        // 所以必须依赖 RestartGame 来重置状态
+        if (SoundController.Instance != null)
+        {
+            SoundController.Instance.PlayBGM();
+        }
+
         ResetGameUI();
     }
 

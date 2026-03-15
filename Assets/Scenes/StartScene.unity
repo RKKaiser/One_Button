@@ -867,6 +867,8 @@ MonoBehaviour:
   chargeLoopSound: {fileID: 8300000, guid: ef4d954578b34604b8c6bb5159fdd42f, type: 3}
   winSound: {fileID: 8300000, guid: 119203a54202e8c478aef6af1bbdd33e, type: 3}
   failSound: {fileID: 8300000, guid: 698cca27e1237ae43ab5b342bda5d4a5, type: 3}
+  bgmClip: {fileID: 8300000, guid: cca0ca0b1eb16834697fe87bdffe5c39, type: 3}
+  bgmVolume: 0.35
 --- !u!4 &1530031291
 Transform:
   m_ObjectHideFlags: 0

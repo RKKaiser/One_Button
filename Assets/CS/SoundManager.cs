@@ -5,7 +5,7 @@ public class SoundController : MonoBehaviour
 {
     public static SoundController Instance { get; private set; }
 
-    [Header("玩家音效")]
+    [Header("玩家音效 (SFX)")]
     public AudioClip floatSound;
     public AudioClip dashSound;
     public AudioClip chargeStartSound;
@@ -15,8 +15,14 @@ public class SoundController : MonoBehaviour
     public AudioClip winSound;
     public AudioClip failSound;
 
-    private AudioSource loopAudioSource;
-    private AudioSource oneShotAudioSource;
+    [Header("背景音乐 (BGM)")] // 【新增】BGM 配置
+    public AudioClip bgmClip;
+    [Range(0f, 1f)]
+    public float bgmVolume = 0.6f; // BGM 音量通常比音效小
+
+    private AudioSource loopAudioSource;      // 用于蓄力循环
+    private AudioSource oneShotAudioSource;   // 用于一次性音效
+    private AudioSource bgmAudioSource;       // 【新增】专门用于 BGM
 
     void Awake()
     {
@@ -26,9 +32,9 @@ public class SoundController : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(gameObject); // 确保切换场景时 BGM 不会断
 
-        // 初始化循环音效源
+        // 1. 初始化蓄力循环源
         GameObject loopAudioObject = new GameObject("Charge Loop Source");
         loopAudioSource = loopAudioObject.AddComponent<AudioSource>();
         loopAudioSource.playOnAwake = false;
@@ -36,12 +42,18 @@ public class SoundController : MonoBehaviour
         loopAudioSource.clip = chargeLoopSound;
         loopAudioSource.transform.SetParent(transform);
 
-        // 初始化一次性音效源
+        // 2. 初始化一次性音效源
         oneShotAudioSource = gameObject.AddComponent<AudioSource>();
         oneShotAudioSource.playOnAwake = false;
         oneShotAudioSource.spatialBlend = 0f;
-        // 【关键设置】确保不会因重叠播放导致声音停不下来
-        oneShotAudioSource.pitch = 1.0f;
+
+        // 3. 【新增】初始化 BGM 源
+        bgmAudioSource = gameObject.AddComponent<AudioSource>();
+        bgmAudioSource.playOnAwake = false;
+        bgmAudioSource.loop = true; // BGM 必须循环
+        bgmAudioSource.volume = bgmVolume;
+        bgmAudioSource.spatialBlend = 0f;
+
     }
 
     void OnEnable()
@@ -54,86 +66,100 @@ public class SoundController : MonoBehaviour
             SealController.OnPlaySoundEvent -= HandlePlaySound;
     }
 
+    // ... (HandlePlaySound, PlayGameSound, PlayOneShot 等方法保持不变) ...
+
     private void HandlePlaySound(SealController.SoundType soundType)
     {
         switch (soundType)
         {
-            case SealController.SoundType.Float:
-                PlayOneShot(floatSound);
-                break;
-            case SealController.SoundType.Dash:
-                PlayOneShot(dashSound);
-                break;
-            case SealController.SoundType.ChargeStart:
-                PlayOneShot(chargeStartSound);
-                break;
-            case SealController.SoundType.ChargeLoop:
-                StartChargeLoop();
-                break;
-            case SealController.SoundType.ChargeStop:
-                StopChargeLoop();
-                break;
+            case SealController.SoundType.Float: PlayOneShot(floatSound); break;
+            case SealController.SoundType.Dash: PlayOneShot(dashSound); break;
+            case SealController.SoundType.ChargeStart: PlayOneShot(chargeStartSound); break;
+            case SealController.SoundType.ChargeLoop: StartChargeLoop(); break;
+            case SealController.SoundType.ChargeStop: StopChargeLoop(); break;
         }
     }
 
     public void PlayGameSound(bool isWin)
     {
-        if (isWin)
-        {
-            PlayOneShot(winSound);
-        }
-        else
-        {
-            PlayOneShot(failSound);
-        }
+        if (isWin) PlayOneShot(winSound);
+        else PlayOneShot(failSound);
     }
 
-    /// <summary>
-    /// 【修改点】播放前先停止当前声音，防止重叠或无限播放
-    /// </summary>
     private void PlayOneShot(AudioClip clip)
     {
         if (clip == null || oneShotAudioSource == null) return;
-
-        // 如果正在播放任何声音，先强制停止
-        if (oneShotAudioSource.isPlaying)
-        {
-            oneShotAudioSource.Stop();
-        }
-
+        if (oneShotAudioSource.isPlaying) oneShotAudioSource.Stop();
         oneShotAudioSource.PlayOneShot(clip);
     }
 
+    // --- BGM 相关新方法 ---
+
     /// <summary>
-    /// 【新增】公开方法：强制停止所有音效（包括循环音效和一次性音效）
-    /// 供 GameManager 在重启时调用
+    /// 播放背景音乐
     /// </summary>
+    public void PlayBGM()
+    {
+        if (bgmClip == null || bgmAudioSource == null)
+        {
+            Debug.LogWarning("BGM Clip or Source is missing!");
+            return;
+        }
+
+        // 如果当前已经在播放同一个音乐，则不重复播放
+        if (bgmAudioSource.clip == bgmClip && bgmAudioSource.isPlaying)
+        {
+            return;
+        }
+
+        bgmAudioSource.clip = bgmClip;
+        bgmAudioSource.Play();
+        Debug.Log("BGM Started: " + bgmClip.name);
+    }
+
+    /// <summary>
+    /// 停止背景音乐
+    /// </summary>
+    public void StopBGM()
+    {
+        if (bgmAudioSource != null && bgmAudioSource.isPlaying)
+        {
+            bgmAudioSource.Stop();
+        }
+    }
+
+    /// <summary>
+    /// 暂停/恢复 BGM (可用于游戏暂停菜单)
+    /// </summary>
+    public void PauseBGM(bool isPaused)
+    {
+        if (bgmAudioSource != null)
+        {
+            bgmAudioSource.Pause(); 
+            if (isPaused) bgmAudioSource.Pause();
+            else bgmAudioSource.UnPause(); 
+        }
+    }
+
     public void StopAllSounds()
     {
         if (oneShotAudioSource != null && oneShotAudioSource.isPlaying)
-        {
             oneShotAudioSource.Stop();
-        }
 
         if (loopAudioSource != null && loopAudioSource.isPlaying)
-        {
             loopAudioSource.Stop();
-        }
+
     }
 
     private void StartChargeLoop()
     {
         if (chargeLoopSound != null && !loopAudioSource.isPlaying)
-        {
             loopAudioSource.Play();
-        }
     }
 
     private void StopChargeLoop()
     {
         if (loopAudioSource != null && loopAudioSource.isPlaying)
-        {
             loopAudioSource.Stop();
-        }
     }
 }
