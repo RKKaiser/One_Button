@@ -63,21 +63,22 @@ public class GameManager : MonoBehaviour
         if (!isGameActive)
         {
             Debug.LogWarning("GameManager: Game already over, ignoring duplicate TriggerGameOver call.");
-            return; // 如果游戏已非活跃状态，直接返回，防止重复弹窗
+            return;
         }
 
         isGameActive = false;
-        Debug.Log("Game Over!");
+
+        // 暂停时间
+        Time.timeScale = 0f;
+
+        Debug.Log("Game Over! Time Paused.");
 
         if (failPanel) failPanel.SetActive(true);
         if (gameHUD) gameHUD.SetActive(false);
 
-        // 播放失败音效可以在 SealController 或 LevelManager 中触发，也可以在这里统一加一个 AudioSource 
+        // 播放失败音效
         AudioSource[] sources = GetComponents<AudioSource>();
         if (sources.Length > 0) sources[0].Play();
-
-        // 延迟重开当前关卡 (目前被注释，需外部控制重启)
-        //StartCoroutine(ReloadLevelAfterDelay(failWaitTime));
     }
 
     // 调用此方法表示游戏胜利 
@@ -87,6 +88,8 @@ public class GameManager : MonoBehaviour
 
         isGameActive = false;
         Debug.Log("Level Complete!");
+
+        Time.timeScale = 0f;
 
         if (winPanel) winPanel.SetActive(true);
         if (gameHUD) gameHUD.SetActive(false);
