@@ -111,7 +111,7 @@ public class GameManager : MonoBehaviour
         }
 
         // 延迟进入下一关 
-        StartCoroutine(LoadNextLevelAfterDelay(winWaitTime));
+        StartCoroutine(LoadNextLevelAfterDelayRealtime(winWaitTime));
     }
 
     //IEnumerator ReloadLevelAfterDelay(float delay) 
@@ -121,29 +121,34 @@ public class GameManager : MonoBehaviour
     //    SceneManager.LoadScene(currentScene);
     //}
 
-    IEnumerator LoadNextLevelAfterDelay(float delay)
+    IEnumerator LoadNextLevelAfterDelayRealtime(float delay)
     {
-        yield return new WaitForSeconds(delay);
+        // 使用 WaitForSecondsRealtime，即使游戏暂停 (timeScale=0) 也会继续计时
+        yield return new WaitForSecondsRealtime(delay);
 
-        // 先隐藏当前面板
+        // 隐藏面板
         if (failPanel) failPanel.SetActive(false);
         if (winPanel) winPanel.SetActive(false);
-
-        // 重置游戏状态，为下一关做准备
-        ResetGameUI();
 
         int currentScene = SceneManager.GetActiveScene().buildIndex;
         int nextScene = currentScene + 1;
 
+        // 检查是否有下一关 
         if (nextScene >= SceneManager.sceneCountInBuildSettings)
         {
+            Debug.Log("恭喜通关所有关卡！返回第一关。");
             nextScene = 0;
-            ResetGameUI();
         }
+
+        Time.timeScale = 1.0f;
+
+        // 重置游戏状态
+        ResetGameUI();
 
         Debug.Log($"Loading Scene {nextScene}");
         SceneManager.LoadScene(nextScene);
     }
+
 
     // 供外部查询游戏是否结束 
     public bool IsGameActive() => isGameActive;

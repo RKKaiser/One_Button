@@ -137,16 +137,11 @@ public class SealController : MonoBehaviour
     // [修改] 进入蓄力状态
     void EnterChargeState()
     {
-        // 如果之前是大跳，现在要蓄力，我们不需要立刻把速度设为0，
-        // 而是交给 FixedUpdate 中的高阻力去处理“刹车”效果
+
         currentState = SealState.Charging;
         currentHoldDuration = 0f;
         floatTimer = 0f;
 
-        // [重要修改] 不再在这里强制 rb.velocity = 0;
-        // 保留当前速度，让物理引擎通过 drag 来减速，手感更自然
-
-        // 但是水平速度必须归零，防止横向漂移
         rb.velocity = new Vector2(0, rb.velocity.y);
 
         if (chargeBarGameObject != null)
