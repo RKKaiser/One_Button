@@ -174,6 +174,11 @@ MonoBehaviour:
   eelPrefab: {fileID: 2670420883641622821, guid: fdfe7bc32a960cc4b882452a6648ec53, type: 3}
   sharkPrefab: {fileID: 8271037012892582131, guid: 1ab500c3fb387ff488867f0b830b4b48, type: 3}
   chaserPrefab: {fileID: 2777056325706324491, guid: 157dc101df39aa342b846b092f97cfb0, type: 3}
+  fishPrefab: {fileID: 2940461272275638318, guid: 44f2d16317dde4d48ac51d7be90f85f4, type: 3}
+  totalFishCount: 15
+  minFishYGap: 10
+  maxFishYGap: 30
+  surfaceSafeZone: 20
   spawnPoints:
   - yPos: 15
     type: 0
@@ -377,8 +382,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1030849607
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 64ac46f22c080774493b5d93b98be660, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -461,8 +466,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1030849607
+  m_SortingLayer: 1
   m_SortingOrder: -4
   m_Sprite: {fileID: 21300000, guid: 0cf77f2f26b13c3498ed6bfa64fcfca4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -735,8 +740,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1030849607
+  m_SortingLayer: 1
   m_SortingOrder: -4
   m_Sprite: {fileID: 21300000, guid: 0aec5fe4ed83f5946be4cc6da861dc10, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -887,8 +892,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1030849607
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: c1dd59f275209c94da2ec9689667d344, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

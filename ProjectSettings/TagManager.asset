@@ -10,7 +10,7 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - fish
   - Water
   - UI
   - obstacle
@@ -42,4 +42,19 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 3264117689
+    locked: 0
+  - name: BackgroundFish
+    uniqueID: 2778778207
+    locked: 0
+  - name: Obstacles
+    uniqueID: 2090883663
+    locked: 0
+  - name: Player
+    uniqueID: 1661213553
+    locked: 0
+  - name: UI
+    uniqueID: 1713600765
     locked: 0
