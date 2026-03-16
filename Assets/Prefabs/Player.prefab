@@ -108,7 +108,7 @@ MonoBehaviour:
   dashDrag: 8
   chargeBrakeDrag: 25
   clickThreshold: 0.2
-  dashLockTime: 0.3
+  dashLockTime: 0.2
   squashAmount: 0.6
   deformLerpSpeed: 10
   chargeBarSlider: {fileID: 0}
